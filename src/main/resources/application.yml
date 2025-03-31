@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: DockerTest
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/test_docker
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate.default_schema: test_docker_schema
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8081
+
+task-management:
+  base-url: http://localhost:8080
+  login-url: /auth/v1/login
+  getTasks-url: /api/v1/task-management/task
+  userName: admin
+  password: admin

@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+    postgres:
+        container_name: docker_test_DB
+        image: postgres:17
+        restart: always
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: test_docker
+        ports:
+            -   "5434:5432"
+        volumes:
+            -   test_docker_DB:/var/lib/postgresql/data
+            -   ./init.sql:/docker-entrypoint-initdb.d/init.sql
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "dockerUser"]
+            interval: 10s
+            retries: 5
+            start_period: 10s
+        networks:
+            -   docker_test_network
+            
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: docker_test_app
+        depends_on:
+            postgres:
+                condition: service_healthy
+        ports:
+            -   8081:8080
+        restart: always
+        networks:
+            - docker_test_network
+
+volumes:
+    test_docker_DB:
+
+networks:
+    docker_test_network:
+        driver: bridge
