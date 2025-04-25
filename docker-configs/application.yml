@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://postgres:5432/test_docker
     username: postgres
-    password: ${DB_PASSWORD}
+    password: password
     driver-class-name: org.postgresql.Driver
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect

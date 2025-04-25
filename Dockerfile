@@ -37,4 +37,4 @@ RUN useradd -m appuser
 USER appuser
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dspring.config.location=file:/config/application.yml", "-jar", "app.jar"]

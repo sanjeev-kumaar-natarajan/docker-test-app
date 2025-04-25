@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: test_docker
+      POSTGRES_PASSWORD: password
+    secrets:
+      - db_password
+    configs:
+      - source: db_init_script
+        target: /docker-entrypoint-initdb.d/init.sql
+    volumes:
+      - docker_test_DB:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5434:5432"
+    networks:
+      - docker_test_network
+
+  app:
+    image: dockertest-app:latest
+    deploy:
+      replicas: 2
+    environment:
+      SPRING_CONFIG_LOCATION: file:/config/application.yml
+    configs:
+      - source: spring_app_config
+        target: /config/application.yml
+      - source: wait_script
+        target: /wait-for-postgres.sh
+    secrets:
+      - db_password
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8080"
+    networks:
+      - docker_test_network
+    entrypoint: [ "sh", "-c" ]
+    command: [ "sh /wait-for-postgres.sh postgres java -jar your-app.jar" ]
+
+volumes:
+  docker_test_DB:
+
+networks:
+  docker_test_network:
+    driver: overlay
+
+secrets:
+  db_password:
+    external: true
+
+configs:
+  spring_app_config:
+    external: true
+  db_init_script:
+    external: true
+  wait_script:
+    external: true
